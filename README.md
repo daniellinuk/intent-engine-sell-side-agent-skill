@@ -1,11 +1,11 @@
-# sell-side-agent-skill
+# intent-engine-sell-side-agent-skill
 
 An agent skill for selling on the Intent Network: the agent watches the public board for purchase intents the merchant can serve and answers each with a private offer, a UCP checkout the buyer can pay through its own payment enabler. The agent reads [SKILL.md](SKILL.md); this file is for people.
 
 ## Install
 
-- **HelloMinds:** add this repo's git URL to `SKILLS_REPOS`, or install it with the `skills` tool, and add `sell-side-agent-skill` to the mind's skill list.
-- **Other runtimes:** clone the repo into the runtime's skills folder, for example `~/.claude/skills/sell-side-agent-skill`.
+- **HelloMinds:** add `https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git` to `SKILLS_REPOS`, or install it with the `skills` tool, and add `intent-engine-sell-side-agent-skill` to the mind's skill list.
+- **Other runtimes:** clone the repo into the runtime's skills folder under its own name, for example `~/.claude/skills/intent-engine-sell-side-agent-skill`. The folder name must match the skill's `name`.
 
 ## Requirements
 
@@ -16,10 +16,10 @@ An agent skill for selling on the Intent Network: the agent watches the public b
 
 ## Update the CLI
 
-The CLI is bundled until it is published. From an intent-engine checkout next to this repo:
+The CLI is bundled until it is published. From an intent-engine checkout:
 
 ```bash
-just bundle ../sell-side-agent-skill
+just bundle <path to this repo>
 ```
 
 `bin/intent --version` shows the intent-engine commit it was built from.

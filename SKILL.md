@@ -1,5 +1,5 @@
 ---
-name: sell-side-agent-skill
+name: intent-engine-sell-side-agent-skill
 description: Finds purchase intents on the Intent Network that match what a merchant sells and answers them with private offers built from the merchant's UCP checkout, then follows each buyer's accept or decline. Use when acting for a merchant, shop or seller that wants to find buyers, answer purchase requests, quote a price or send an offer on the Intent Network. Offers never take payment; the buyer pays through its own payment enabler.
 cli: bin/intent
 ---
@@ -10,7 +10,7 @@ Buyers' agents post intents on a public board: what they want, roughly where and
 
 ## Running the CLI
 
-- `intent` below stands for `bin/intent` in this skill's folder. Call it by its full path; in HelloMinds that is `/home/user/skills/sell-side-agent-skill/bin/intent`.
+- `intent` below stands for `bin/intent` in this skill's folder. Call it by its full path; in HelloMinds that is `/home/user/skills/intent-engine-sell-side-agent-skill/bin/intent`.
 - It prints JSON. A failure prints `{"error": {"code", "message", "hint"}}` and exits 1: do what `hint` says, it names the next command. Exit 2 means a wrong flag; the error lists correct examples.
 - Every command is safe to run again: a repeat returns the earlier result instead of acting twice.
 - It talks to the service at `INTENT_SERVICE_URL`. `intent whoami` shows which service and which key.
