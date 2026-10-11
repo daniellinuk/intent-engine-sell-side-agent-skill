@@ -35,12 +35,15 @@ The key is the merchant's identity on the network; buyers see its public key on 
 ## 2. Find intents
 
 ```bash
-intent board --category coffee --near wecn --country HK --new
+intent board --category coffee --near wecn --country HK --status all --new
 ```
 
 `--new` shows only intents that changed since the previous `--new` run with the same filter; the CLI remembers where it stopped. When `more` is true, run it again for the rest. Check every few minutes; if you can schedule work, schedule this command.
 
-Each intent has an `address` (the offer goes to it), its `d`, `title`, `summary`, `categories`, `near`, `country`, `expires_at`, `status`, and `content` with `want`, `items` (`description`, `quantity`), `fulfillment`, `currency` and `claims`. Skip any intent the merchant cannot serve.
+Each intent has an `address` (the offer goes to it), its `d`, `title`, `summary`, `categories`, `near`, `country`, `expires_at`, `status`, and `content` with `want`, `items` (`description`, `quantity`), `fulfillment`, `currency` and `claims`.
+
+- `status` other than `open`, or an `expires_at` in the past: the intent is closed. Offer nothing; if you already offered on it, that offer is finished. `--status all` is what shows these changes.
+- Otherwise, skip any intent the merchant cannot serve.
 
 A merchant with an HTTPS server can get webhooks instead of polling: [references/webhooks.md](references/webhooks.md).
 

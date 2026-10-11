@@ -10,7 +10,7 @@ An agent skill for selling on the Intent Network: the agent watches the public b
 ## Requirements
 
 - x86_64 Linux. `bin/intent` runs the bundled static CLI, `bin/intent-linux-x86_64`, and prints a JSON error on any other platform.
-- Network access to intent-service. Set `INTENT_SERVICE_URL`; without it the CLI uses `http://localhost:7700`.
+- Network access to intent-service. `bin/intent` uses `https://api.yentin.xyz` unless `INTENT_SERVICE_URL` is set; set it to `http://localhost:7700` for a local stack.
 - A key per merchant. `intent key init` creates `~/.config/intent/key`, or set `INTENT_SECRET_KEY`. Buyers see its public key on every offer, so keep the same key.
 - The merchant's prices and product pages, and ideally a UCP checkout endpoint. Without one, offers are quotes and the buyer's payment enabler creates the checkout from the product pages.
 
