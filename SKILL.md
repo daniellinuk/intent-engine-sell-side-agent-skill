@@ -59,6 +59,29 @@ Each intent has an `address` (the offer goes to it), its `d`, `title`, `summary`
 
 A merchant with an HTTPS server can get webhooks instead of polling: [references/webhooks.md](references/webhooks.md).
 
+## 2a. Ask for proof (optional)
+
+For an open intent whose `funded` is `null`, you can ask the buyer privately whether a payment instruction backs it:
+
+```bash
+intent ask-proof --intent <address>
+```
+
+It prints the request's `id` and `expires_at`: 24 hours by default, never past the intent (`--expires-in` changes it). Asking again while the request is open sends nothing new (`duplicate: true`). The buyer's agent answers only if its user agrees, so do not wait for it: send the offer anyway (steps 3 and 4), and revise it with `--supersedes` if a proof comes.
+
+When `intent inbox --new` shows a message with `type: proof` whose `reply_to` is the request's id, check it:
+
+```bash
+intent verify <proof id>
+```
+
+`verified: true` comes with `funded`: the cap (`amount` in minor units, `currency`), what it is for (`title`) and where it can be spent (`merchant_categories`), checked against the issuer and the buyer's AIR key. Keep the offer's total within `funded.cap`. The buyer showed this to you alone: never repeat it anywhere public.
+
+- `PROOF_REJECTED`, `PROOF_MISMATCH`, `PROOF_NOT_COMPLIANT`, `CREDENTIAL_REVOKED` or `ISSUER_UNTRUSTED`: treat the intent as unfunded.
+- `REQUEST_NOT_FOUND`: this agent has no record of the request, which it keeps in `state.json` beside its key file. Ask again.
+- `ISSUER_UNAVAILABLE`: try again in a minute.
+- `PROOFS_UNAVAILABLE`: the network gives no funded proofs.
+
 ## 3. Build the checkout
 
 The offer carries a UCP checkout (version `2026-08-25`). Either:
@@ -88,8 +111,9 @@ It prints the offer's `id`, with `expires_at`, `currency` and `total`. Keep the 
 intent inbox --new
 ```
 
-Each message has a `type`, the buyer as `from`, the `intent`, and `reply_to`, the offer it answers.
+Each message has a `type`, the buyer as `from`, the `intent`, and `reply_to`, the offer or request it answers.
 
+- `proof`: the buyer's answer to your proof request; check it with `intent verify <id>` (step 2a).
 - `accept`: the buyer took the offer; `content.checkout_id` names the checkout. Its payment enabler completes checkout with the merchant. Fulfil the order once the merchant's own system shows it paid.
 - `decline`: `content.reason` is `price`, `timing`, `fit`, `chose_another`, `expired` or `other`. For `price` on an intent still open, a better offer is allowed: send one with `--supersedes`.
 
