@@ -29,6 +29,7 @@ A POST for every version of a matching intent:
 ```
 
 - `type` is `intent.created`, then `intent.updated`, `intent.cancelled` or `intent.fulfilled`. Stop offering on a cancelled or fulfilled intent.
+- `intent.badged` means the service has just given the intent a funded badge. `event` is the intent's current version and `badges` holds the badge: a kind 1985 event signed by the service key, with the cap in its `cap` tag, e.g. `["cap", "15000", "USD"]`. `intent board` shows the same badge, already checked, as `funded`.
 - `fit` is how well the intent fits the subscription's categories and profile, 0 to 1, or `null` when it was not judged.
 - The event's `a` address, `30468:<author>:<d>`, is what `intent offer --intent` takes.
 

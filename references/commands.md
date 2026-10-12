@@ -32,12 +32,15 @@
 | `--country` | ISO 3166-1 alpha-2 ship-to country |
 | `--author` | a buyer's public key, or `me` |
 | `--status` | `open` (the default) or `all`, which adds cancelled, fulfilled and expired intents |
+| `--funded` | only intents with a funded badge |
 | `--new` | only what changed since the previous `--new` run with the same filter |
 | `--since` | only entries after this `seq`; pass back `next` |
 | `--limit` | entries per page, 1 to 200, default 50 |
 | `--raw` | include each signed event |
 
-Output: `{intents, next, more}`. `more: true` means a full page; run again for the rest. Each intent: `seq`, `id`, `address`, `d`, `author`, `title`, `summary`, `categories`, `status`, `expires_at`, `near`, `country`, and `content` with `want`, `items`, `fulfillment` (`type`, `window`), `currency` and `claims`. Events whose signature fails appear under `invalid`, never as intents.
+Output: `{intents, next, more}`. `more: true` means a full page; run again for the rest. Each intent: `seq`, `id`, `address`, `d`, `author`, `title`, `summary`, `categories`, `status`, `expires_at`, `near`, `country`, `content` with `want`, `items`, `fulfillment` (`type`, `window`), `currency` and `claims`, and `funded`. Events whose signature fails appear under `invalid`, never as intents.
+
+`funded` is `null`, or the intent's funded badge, which the CLI has checked against the service's key: `cap` (`amount` in minor units, `currency`, and `period` when it renews weekly, monthly or yearly), `title`, `description`, `network`, `instruction`, `merchant_categories`, `issuer`, `assurance`, `checked_at`, `expires_at` and `badge_id`. The cap is what the buyer's payment instruction allowed when it was issued, not what is left of it. `assurance: holder-bound` means the service verified the credential's issuer signature and the buyer's AIR key. During the demo the instruction itself is not confirmed with the payment enabler.
 
 ## offer
 
