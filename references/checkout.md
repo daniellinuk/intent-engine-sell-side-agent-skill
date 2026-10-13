@@ -47,12 +47,12 @@ intent offer --intent <address> --endpoint https://shop.example.com/ucp \
 
 | Field | What to put |
 | --- | --- |
-| `id` | the session id your UCP endpoint returned, or your own quote id when there is no session |
-| `status` | `ready_for_complete`, or `incomplete` when the buyer must still add details such as an address. Never `completed` or `canceled`: the buyer refuses them |
+| `id` | the session id the UCP endpoint returned. A quote id only when there is no session |
+| `status` | `ready_for_complete` for a session the buyer can complete. `incomplete` only when something the buyer must add, such as shipping, is still unknown: the buyer does not accept it. Never `completed` or `canceled` |
 | `currency` | ISO 4217, ideally the intent's `content.currency` |
 | `line_items[].item.price` | the unit price in minor units: HK$22.00 is `2200`, ¥500 is `500` |
 | `line_items[].quantity` | how many |
-| `line_items[].totals` and `totals` | `subtotal` and `total` amounts in minor units; the checkout `total` is what the buyer will pay |
+| `line_items[].totals` and `totals` | `subtotal` and `total` in minor units. `total` is the amount the buyer will pay, including tax and any shipping already known. A later tax or shipping line makes the buyer refuse |
 | `links` | at least the terms of service |
 | `expires_at` | optional RFC 3339 time; the offer never outlasts it |
 
@@ -60,8 +60,8 @@ Minor units: divide by 100 for display in two-decimal currencies (HKD, USD, EUR)
 
 ## Session or quote
 
-- **Live session.** Create it at your UCP endpoint (`POST {endpoint}/checkout-sessions`, no payment) and send what it returns. Before paying, the buyer reads `GET {endpoint}/checkout-sessions/{id}` and pays only when it matches the offer. Changing the session's price after offering makes the buyer refuse; send a new offer with `--supersedes` instead.
-- **Quote.** With no session, `id` is your own quote id, and the buyer's payment enabler creates the session from the item URLs when it pays. Its checkout must total exactly what the offer says, so the prices on the product pages must match the quote.
+- **Live session.** This is the offer a funded buyer can pay. Create it at the UCP endpoint (`POST {endpoint}/checkout-sessions`, no payment) and send what it returns. The buyer reads `GET {endpoint}/checkout-sessions/{id}` and completes that session with the active payment instruction. Changing the price after offering makes the buyer refuse; send a new offer with `--supersedes` instead.
+- **Quote.** Only when there is no UCP endpoint. `id` is your own quote id, and each `--item-url` is the URL of that one SKU. The buyer's payment enabler creates the session from those URLs. Its total must equal the quote, so the price at that URL, plus tax and known shipping, must already be in the quote. A page that lists several variants is not enough.
 
 ## Discounts and claims
 

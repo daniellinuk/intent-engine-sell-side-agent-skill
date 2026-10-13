@@ -90,10 +90,12 @@ intent verify <proof id>
 
 ## 3. Build the checkout
 
-The offer carries a UCP checkout (version `2026-08-25`). Either:
+The offer carries a UCP checkout (version `2026-08-25`). The buyer pays that checkout. A product URL alone leaves the buyer to build another one.
 
-- **The merchant has a UCP endpoint:** create a checkout session there without paying (`POST {endpoint}/checkout-sessions` with the line items) and save the checkout it returns. The buyer re-reads that session before paying.
-- **It has none:** write the checkout from the template in [references/checkout.md](references/checkout.md), with the merchant's real prices. The buyer's payment enabler creates the session from the product URLs when it pays.
+On a funded intent, create a live session. The buyer's agent completes it with the active payment instruction.
+
+- **Live session.** Use this whenever the merchant has a UCP endpoint, and always for a funded intent. `POST {endpoint}/checkout-sessions` with the line items and no payment, then save the checkout it returns. `status` must be `ready_for_complete`. The `total` is the amount the buyer will pay, including tax and any shipping you already know, and on a funded intent it stays within `funded.cap`. The buyer re-reads this session and completes it. If the price later changes, send a new offer with `--supersedes`.
+- **Quote.** Use this only when the merchant has no UCP endpoint. Write it from the template in [references/checkout.md](references/checkout.md). The buyer's payment enabler has to create a session, and that session's total must equal the quote. If shipping is not known yet, set `status` to `incomplete`. The buyer does not accept an incomplete checkout.
 
 ## 4. Send the offer
 
@@ -104,7 +106,7 @@ intent offer --intent <address> --endpoint https://shop.example.com/ucp \
   --expires-in 12h
 ```
 
-- Give every line item an `--item-url`, its product page; the buyer's payment enabler checks out from it.
+- Give every line item an `--item-url`: the URL that buys that exact item, one SKU, not a page of several variants. On a live session the buyer completes the session. On a quote, the payment enabler creates the session from this URL.
 - `--code` adds a discount code and `--eligibility` a claim the price relies on.
 - The offer never outlasts the intent or the checkout's `expires_at`.
 - The checkout is checked against the UCP schema first; `CHECKOUT_INVALID` lists what to fix.

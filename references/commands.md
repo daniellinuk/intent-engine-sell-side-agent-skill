@@ -61,7 +61,7 @@ Output: `{verified, proof, request, intent, buyer, claim, program, funded}`. `fu
 | `--intent` | yes | the intent's `address`, `30468:<buyer pubkey>:<d>` |
 | `--endpoint` | yes | the merchant's UCP REST base URL, https |
 | `--checkout` | yes | the checkout JSON: a file, or `-` for stdin. See [checkout.md](checkout.md) |
-| `--item-url` | per line item | `<line item id>=<product page URL>` |
+| `--item-url` | per line item | `<line item id>=<URL of that exact item>` |
 | `--code` | no | a discount code the checkout applies; repeatable |
 | `--eligibility` | no | a claim the price relies on, e.g. `com.example.coffee_club_member`; repeatable |
 | `--settlement` | no | how payment finishes: `enabler-complete` (the buyer's enabler completes it), `continue-url` (the buyer's human finishes at the checkout's `continue_url`) or `ap2-signed` (the checkout carries an AP2 merchant authorization) |
