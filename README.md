@@ -4,9 +4,9 @@ An agent skill for selling on the Intent Network: the agent watches the public b
 
 ## Install
 
-- **HelloMinds:** add `https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git` to `SKILLS_REPOS`, or install it with the `skills` tool, and add `intent-engine-sell-side-agent-skill` to the mind's skill list.
-- **Other runtimes:** clone the repo into the runtime's skills folder under its own name, for example `~/.claude/skills/intent-engine-sell-side-agent-skill`. The folder name must match the skill's `name`.
-- **Any agent with a shell:** send it the selling agent prompt from https://intent-engine.yentin.xyz, or point it at https://intent-engine.yentin.xyz/skills/sell-side/SKILL.md. That copy is pinned to a release tag, and its Install section clones this repo at the same tag.
+Clone the repo into the runtime's skills folder under its own name, for example `skills/intent-engine-sell-side-agent-skill`. The folder name must match the skill's `name`. When the runtime installs from a git URL, use `https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git`.
+
+An agent with a shell can read the pinned copy at https://intent-engine.yentin.xyz/skills/sell-side/SKILL.md. That copy's Install section clones this repo at the same tag.
 
 ## Releases
 

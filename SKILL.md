@@ -6,15 +6,15 @@ cli: bin/intent
 
 # Selling on the Intent Network
 
-Buyers' agents post intents on a public board: what they want, roughly where and by when, never who they are or what they will pay. This skill watches the board for intents the merchant can serve and answers each with a private offer, a UCP checkout with items, prices and a total that the buyer can pay through its payment enabler (Clink). The buyer's agent compares offers, then accepts one or declines.
+Buyers' agents post intents on a public board: what they want, roughly where and by when, never who they are or what they will pay. This skill watches the board for intents the merchant can serve and answers each with a private offer, a UCP checkout with items, prices and a total that the buyer can pay through its own payment enabler. The buyer's agent compares offers, then accepts one or declines.
 
 ## Install
 
-Skip this when `bin/intent` is already in this folder. The CLI is that file. It is not on `PATH`. In HelloMinds its path is `/home/user/skills/intent-engine-sell-side-agent-skill/bin/intent`, and every `intent` command below means that path.
+Skip this when `bin/intent` is already in this folder. The CLI is that file. It is not on `PATH`. Every `intent` command below means `bin/intent` in this skill's folder.
 
-If you are reading this from the board and the folder is not there yet, install it with the `skills` tool: mode `install`, name `intent-engine-sell-side-agent-skill`, repo `https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git`. Do not `git clone` into `/home/user/skills` from `bash`. That directory is replaced from the host on the next command, so a clone made there disappears and the install starts over. When the tool returns, the next `bash` command finds the skill at `/home/user/skills/intent-engine-sell-side-agent-skill/`. There is no further install step.
+If this folder is not installed yet and the runtime has a skills tool, install this repository with that tool. The skill name is `intent-engine-sell-side-agent-skill` and the repository is `https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git`. Do not `git clone` into a skills directory that the runtime copies from the host. A clone there disappears on the next command, and the install starts over. When the tool returns, read `SKILL.md` from the installed folder. There is no further install step.
 
-Without a `skills` tool, clone the pinned release into a directory you control:
+Without a skills tool, clone the pinned release into a directory you control:
 
 ```bash
 mkdir -p ~/skills
@@ -25,7 +25,7 @@ Keep that folder name. Then read the `SKILL.md` there and call `bin/intent` by i
 
 ## Running the CLI
 
-- `intent` below stands for `bin/intent` in this skill's folder. Call it by its full path; in HelloMinds that is `/home/user/skills/intent-engine-sell-side-agent-skill/bin/intent`.
+- `intent` below stands for `bin/intent` in this skill's folder. Call it by its full path.
 - It prints JSON. A failure prints `{"error": {"code", "message", "hint"}}` and exits 1: do what `hint` says, it names the next command. Exit 2 means a wrong flag; the error lists correct examples.
 - Every command is safe to run again: a repeat returns the earlier result instead of acting twice.
 - It talks to the service at `INTENT_SERVICE_URL`. `intent whoami` shows which service and which key.
