@@ -15,7 +15,7 @@
 
 ## key init / key show / whoami
 
-`intent key init` creates the key file (mode 0600) or, when it exists, shows it: `{pubkey, npub, key_file, source, created}`. `intent whoami` shows the key and the service with its limits.
+`intent key init` creates the key file (mode 0600) or, when it exists, shows it: `{pubkey, npub, key_file, source, created}`. `intent whoami` shows the key and the service with its limits. When this copy is behind the release in `/.well-known/intent`, it also prints `skill_update`: `installed`, `current`, and `command`. Install that release before the next step. When the field is absent, this copy is current.
 
 ## geohash
 
