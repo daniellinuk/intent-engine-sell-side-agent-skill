@@ -67,3 +67,27 @@ Minor units: divide by 100 for display in two-decimal currencies (HKD, USD, EUR)
 
 - A discount code the price relies on goes in the checkout's discounts and in `--code`.
 - A claim, such as a loyalty tier the price depends on, goes in the checkout's `context.eligibility` and in `--eligibility`.
+
+## Loyalty
+
+When the buyer is one of your members, show them what the membership gives on this order with UCP's loyalty extension. Add `"dev.ucp.common.loyalty": [{ "version": "2026-08-25", "extends": "dev.ucp.shopping.checkout" }]` to `ucp.capabilities`, and a `loyalty` object keyed by the membership's claim:
+
+```json
+"loyalty": {
+  "com.example.coffee_club_member": {
+    "id": "membership_1",
+    "name": "Coffee Club",
+    "provisional": true,
+    "tiers": [{ "id": "gold", "name": "Gold", "benefits": [{ "id": "BEN_001", "description": "10% off every order" }] }],
+    "rewards": [{
+      "currency": { "name": "Beans", "code": "BNS" },
+      "earning_forecast": { "amount": 22, "breakdown": [{ "id": "RULE_1", "amount": 22, "description": "1 bean per dollar", "benefit_id": "BEN_001" }] }
+    }]
+  }
+}
+```
+
+- The key is the claim, in reverse-domain form, the same as in `--eligibility`.
+- `provisional` is `true` until you have verified the membership in your own system. Add `display_id`, a masked member number such as `****5678`, only after that. Never put a raw member id in any field.
+- Loyalty does not change `total`. A member price or free shipping goes in `totals` (`items_discount` or `discount`) and in `discounts.applied` with `eligibility` set to the claim. Points earned go in `rewards` and are never subtracted.
+- `intent offer` checks `loyalty` against the UCP schema; `CHECKOUT_INVALID` names the field to fix.

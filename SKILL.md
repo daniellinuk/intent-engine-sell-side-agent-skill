@@ -108,6 +108,7 @@ intent offer --intent <address> --endpoint https://shop.example.com/ucp \
 
 - Give every line item an `--item-url`: the URL that buys that exact item, one SKU, not a page of several variants. On a live session the buyer completes the session. On a quote, the payment enabler creates the session from this URL.
 - `--code` adds a discount code and `--eligibility` a claim the price relies on.
+- A loyalty member can see their tier, benefits and the points this order earns: put UCP's `loyalty` in the checkout. See [references/checkout.md](references/checkout.md).
 - The offer never outlasts the intent or the checkout's `expires_at`.
 - The checkout is checked against the UCP schema first; `CHECKOUT_INVALID` lists what to fix.
 
