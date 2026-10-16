@@ -54,6 +54,8 @@ intent offer --intent <address> --endpoint https://shop.example.com/ucp \
 | `line_items[].quantity` | how many |
 | `line_items[].totals` and `totals` | `subtotal` and `total` in minor units. `total` is the amount the buyer will pay, including tax and any shipping already known. A later tax or shipping line makes the buyer refuse |
 | `links` | at least the terms of service |
+| `policies` | optional return, warranty and other terms, each with a `type` such as `dev.ucp.shopping.policy.return` and a `description`. The buyer shows them to its user |
+| `messages` | optional notes. A `warning` with `presentation: "disclosure"` is shown word for word beside what its `path` names (`$.line_items[0]`, or no `path` for the whole order) and never hidden: use it for allergens, safety notices and terms the buyer must see |
 | `expires_at` | optional RFC 3339 time; the offer never outlasts it |
 
 Minor units: divide by 100 for display in two-decimal currencies (HKD, USD, EUR), not at all in zero-decimal ones (JPY, KRW).
@@ -91,3 +93,64 @@ When the buyer is one of your members, show them what the membership gives on th
 - `provisional` is `true` until you have verified the membership in your own system. Add `display_id`, a masked member number such as `****5678`, only after that. Never put a raw member id in any field.
 - Loyalty does not change `total`. A member price or free shipping goes in `totals` (`items_discount` or `discount`) and in `discounts.applied` with `eligibility` set to the claim. Points earned go in `rewards` and are never subtracted.
 - `intent offer` checks `loyalty` against the UCP schema; `CHECKOUT_INVALID` names the field to fix.
+
+## Fulfillment
+
+Say how and when the order reaches the buyer with UCP's fulfillment extension. Add `"dev.ucp.shopping.fulfillment": [{ "version": "2026-08-25", "extends": "dev.ucp.shopping.checkout" }]` to `ucp.capabilities`, and a `fulfillment` object:
+
+```json
+"fulfillment": {
+  "methods": [{
+    "id": "method_1",
+    "type": "shipping",
+    "line_item_ids": ["li_1"],
+    "selected_destination_id": "dest_area",
+    "destinations": [{ "type": "shipping_address", "id": "dest_area", "address_country": "HK" }],
+    "groups": [{
+      "id": "package_1",
+      "line_item_ids": ["li_1"],
+      "selected_option_id": "morning",
+      "options": [{
+        "id": "morning",
+        "title": "Morning delivery",
+        "description": { "plain": "Delivered between 8:15 and 8:45 each weekday" },
+        "earliest_fulfillment_time": "2026-09-28T08:15:00+08:00",
+        "latest_fulfillment_time": "2026-10-02T08:45:00+08:00",
+        "totals": [{ "type": "total", "amount": 0 }]
+      }]
+    }]
+  }]
+}
+```
+
+- **Price it for the area.** The intent never says the buyer's address, so you do not know it when you quote. Price the option for the intent's `near` geohash and `country`, and honor that price for any address in that area. The buyer's payment enabler adds the stored address at payment. A destination names the area only: `address_country`, and a region or locality if the price depends on it. Never a street, a name or a phone number.
+- **Method `type`.** `shipping` for anything brought to the buyer, `pickup` or `curbside` for collection at your location (a `business_location` destination with its `name`). The buyer matches it to the intent's `fulfillment.type`: `delivery` and `shipping` to `shipping` or `delivery`, `pickup` to `pickup` or `curbside`, `digital` to `digital`, `service` to `service`.
+- **Select one option per group** with `selected_option_id`. That option is the offer: the buyer refuses a checkout that later selects another one.
+- **Give a delivery estimate.** `earliest_fulfillment_time` and `latest_fulfillment_time` are RFC 3339 times. The buyer checks them against the intent's `fulfillment.window`, and ranks an offer that arrives outside it after the offers that arrive inside it. An option with no estimate is not checked.
+- The option's price goes in its own `totals`, and in the checkout's `totals` as a `fulfillment` line when it is not zero. The checkout `total` includes it.
+
+## Payment terms
+
+When part of the payment is due after checkout, such as a deposit now and the balance at check-in, installments, or Net 30, say so with UCP's payment terms extension. Add `"dev.ucp.common.payment.terms": [{ "version": "2026-08-25", "extends": ["dev.ucp.shopping.checkout", "dev.ucp.shopping.order"] }]` to `ucp.capabilities`, and the terms to `payment`:
+
+```json
+"payment": {
+  "selected_term_id": "pt_deposit",
+  "terms": [{
+    "id": "pt_deposit",
+    "title": "First night now, balance at check-in",
+    "schedules": [
+      { "id": "s1", "type": "immediate", "description": { "plain": "Due today when you book." }, "amount": 30000 },
+      { "id": "s2", "type": "deferred", "description": { "plain": "Due at check-in on November 2, 2026." }, "due_at": "2026-11-02T15:00:00+08:00", "amount": 90000 }
+    ]
+  }]
+}
+```
+
+- `selected_term_id` names the term in effect. The selected term's schedule amounts add up to the checkout `total` exactly.
+- Each schedule is one payment. Its `description` says on its own when it is due. `immediate` is due at checkout; any other `type`, such as `deferred`, is due later. Add `due_at` when you know the date.
+- A finance charge or a saving for paying now is its own line in `totals`: a `fee`, or a negative `discount`, with `display_text`.
+- **The selected term is the deal.** The buyer never changes your session, so it cannot choose another term: it accepts the selected one or declines. To offer a different term, send a new offer with `--supersedes`. You may list other terms beside it, but only the selected one is binding.
+- The buyer refuses a checkout whose selected term, or its schedules' number, types, due dates or amounts, changed after you offered, and one that carries a `payment_term_changed` warning.
+- Terms the buyer must see, such as a deposit that is not refunded, go in a policy whose `applies_to` names the term (`$.payment.terms[0]`), with a disclosure warning whose `code` is that policy's `type`.
+- On a funded intent, the whole `total` stays within `funded.cap`, not only what is due today. A buyer whose payment method cannot pay the later schedules declines.
