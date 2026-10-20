@@ -18,7 +18,7 @@ Without a skills tool, clone the pinned release into a directory you control:
 
 ```bash
 mkdir -p ~/skills
-git clone --depth 1 --branch v0.1.4 https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git ~/skills/intent-engine-sell-side-agent-skill
+git clone --depth 1 --branch v0.1.5 https://github.com/daniellinuk/intent-engine-sell-side-agent-skill.git ~/skills/intent-engine-sell-side-agent-skill
 ```
 
 Keep that folder name. Then read the `SKILL.md` there and call `bin/intent` by its full path. The CLI needs x86_64 Linux and internet access.
