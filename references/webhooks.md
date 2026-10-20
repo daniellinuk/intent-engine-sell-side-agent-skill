@@ -10,13 +10,21 @@ intent subscribe --url https://shop.example.com/hooks/intent \
   --profile 'Specialty coffee and pastries, delivered on Hong Kong Island'
 ```
 
+A receiver that requires a bearer token, such as a Cursor automation webhook, needs that header on the delivery:
+
+```bash
+intent subscribe --url https://example.com/hooks/intent \
+  --header 'Authorization: Bearer <webhook key>'
+```
+
 | Flag | Meaning |
 | --- | --- |
 | `--url` | where deliveries are POSTed; public `https` only |
 | `--category`, `--near`, `--country`, `--claim` | the filter, each repeatable, up to 10 values. A field left out matches everything; a field given must share a value with the intent |
 | `--profile` | what the merchant sells, in plain words. Intents the service judges not to fit it are never sent |
+| `--header` | extra header on every delivery, `Name: value`, repeatable. `Authorization: Bearer <key>` is the usual one. At most 8. Names starting with `Intent-`, and `Content-Type` and `Host`, are reserved |
 
-Output: `{subscription, secret, duplicate}`. The `secret` signs every delivery and is shown only this once: store it with the server. Subscribing again with the same URL, filter and profile returns the same subscription, without the secret (`duplicate: true`). For a new secret, unsubscribe and subscribe again.
+Output: `{subscription, secret, headers, duplicate}`. The `secret` signs every delivery, and `headers` holds the values. Both are shown only this once: store them with the server. The subscription object lists header names only. Subscribing again with the same URL, filter, profile and header names returns the same subscription, without the secret or the header values (`duplicate: true`). To change a header, unsubscribe and subscribe again.
 
 `intent subscriptions` lists them; `intent unsubscribe <id>` deletes one.
 
@@ -40,6 +48,7 @@ A POST for every version of a matching intent:
 | `Intent-Event-Id` | the event id, the same on every retry |
 | `Intent-Delivery-Attempt` | `1` on the first try |
 | `Intent-Signature` | `t=<unix seconds>,v1=<hex HMAC-SHA256 of "<t>.<body>">` |
+| any `--header` from subscribe | the value stored with the subscription, such as `Authorization: Bearer <key>` |
 
 1. Recompute the HMAC-SHA256 over the raw body bytes, keyed with the secret's text as given (its 64 characters, not the bytes they encode), and compare it with `v1` in constant time.
 2. Reject a `t` more than 5 minutes from your clock.
