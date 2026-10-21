@@ -15,7 +15,7 @@
 
 ## key init / key show / whoami
 
-`intent key init` creates the key file (mode 0600) or, when it exists, shows it: `{pubkey, npub, key_file, source, created}`. `intent whoami` shows the key and the service with its limits. When this copy is behind the release in `/.well-known/intent`, it also prints `skill_update`: `installed`, `current`, and `command`. Install that release before the next step. When the field is absent, this copy is current.
+`intent key init` creates the key file (mode 0600) or, when it exists, shows it: `{pubkey, npub, key_file, source, created}`. The path is `INTENT_KEY_FILE`, or `~/.config/intent/key` when that variable is unset. Agents on one machine that leave it unset share that file and its offers. If this persona must be a separate merchant, set `INTENT_KEY_FILE` to the path your instructions name. Do not invent a path, and do not create a second key to take over offers the current key already sent. `intent whoami` shows the key in use (`agent.pubkey`, and `agent.key_file` when `agent.source` is `file`) and the service with its limits. Run it at the start. On `KEY_MISSING`, set `INTENT_KEY_FILE` to the path your instructions name, run `key init`, then `whoami` again. Run it again before an offer. When this copy is behind the release in `/.well-known/intent`, it also prints `skill_update`: `installed`, `current`, and `command`. Install that release before the next step. When the field is absent, this copy is current.
 
 ## geohash
 

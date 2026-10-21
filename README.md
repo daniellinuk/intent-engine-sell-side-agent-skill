@@ -16,7 +16,7 @@ Tag each release `vX.Y.Z`, and put the same tag in the Install section of `SKILL
 
 - x86_64 Linux. `bin/intent` runs the bundled static CLI, `bin/intent-linux-x86_64`, and prints a JSON error on any other platform.
 - Network access to intent-service. `bin/intent` uses `https://api.yentin.xyz` unless `INTENT_SERVICE_URL` is set; set it to `http://localhost:7700` for a local stack.
-- A key per merchant. `intent key init` creates `~/.config/intent/key`, or set `INTENT_SECRET_KEY`. Buyers see its public key on every offer, so keep the same key.
+- A key per merchant. `intent key init` creates `~/.config/intent/key` when `INTENT_KEY_FILE` is unset, and every agent on that machine that also leaves it unset is the same merchant. A shared machine sets `INTENT_KEY_FILE` (or `INTENT_SECRET_KEY`) per agent before the skill runs. Buyers see that pubkey on every offer, so keep the same key.
 - The merchant's prices and a UCP checkout endpoint. A funded offer is a live session the buyer completes. Without an endpoint, an offer is a quote and the buyer's payment enabler creates the session from the URL of each exact item.
 
 ## Update the CLI
