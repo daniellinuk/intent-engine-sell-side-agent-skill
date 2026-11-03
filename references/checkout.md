@@ -1,6 +1,6 @@
-# The checkout an offer carries
+# The UCP session a merchant creates
 
-An offer carries one UCP checkout object, version `2026-08-25`. `intent offer` checks it against the UCP schema before sending, and the buyer checks it again before paying.
+`intent offer --checkout` checks this file against the UCP schema, version `2026-08-25`, and sends only its `id`. The buyer re-reads that session before Agree. A shop with no UCP does not use this file; it sends a cart and a checkout page.
 
 ## Template
 

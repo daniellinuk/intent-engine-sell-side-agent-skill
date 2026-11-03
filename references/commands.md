@@ -59,25 +59,24 @@ Output: `{verified, proof, request, intent, buyer, claim, program, funded}`. `fu
 | Flag | Required | Meaning |
 | --- | --- | --- |
 | `--intent` | yes | the intent's `address`, `30468:<buyer pubkey>:<d>` |
-| `--endpoint` | yes | the merchant's UCP REST base URL, https |
-| `--checkout` | yes | the checkout JSON: a file, or `-` for stdin. See [checkout.md](checkout.md) |
-| `--item-url` | per line item | `<line item id>=<URL of that exact item>` |
-| `--code` | no | a discount code the checkout applies; repeatable |
-| `--eligibility` | no | a claim the price relies on, e.g. `com.example.coffee_club_member`; repeatable |
-| `--settlement` | no | how payment finishes: `enabler-complete` (the buyer's enabler completes it), `continue-url` (the buyer's human finishes at the checkout's `continue_url`) or `ap2-signed` (the checkout carries an AP2 merchant authorization) |
+| `--endpoint` | with `--checkout` | the merchant's UCP REST base URL, https. This offer's rail is `ucp` |
+| `--checkout` | with `--endpoint` | the UCP session JSON: a file, or `-` for stdin. Checked locally; only its id is sent. See [checkout.md](checkout.md) |
+| `--checkout-url` | with `--cart`; optional on a UCP offer | the guest checkout page. On a UCP offer it is the fallback if UCP payment misses |
+| `--merchant-name` | with `--checkout-url` | the shop name Browser Pay sends as `merchantName` |
+| `--cart` | for a checkout page | the locked cart JSON: `currency`, `total`, `items` with `id`, `title`, `quantity`, `price`. Amounts are minor units |
 | `--expires-in` | no | `90m`, `12h`, `7d`; default `24h`, never past the intent or the checkout |
 | `--supersedes` | no | the id of the merchant's earlier offer that this one replaces |
 | `--reply-to` | no | the id of the message this answers |
 | `--dry-run` | no | print the gift wrap without sending |
 
-Output: `{sent, id, type, duplicate, expires_at, currency, total}`. The buyer sees only the latest offer from each merchant, so sending one again is harmless.
+Output: `{sent, id, type, duplicate, rail, expires_at, currency, total}`. The buyer sees only the latest offer from each merchant, so sending one again is harmless. A cart offer does not use `--endpoint` or `--checkout`. A UCP offer does not use `--cart`.
 
 ## inbox
 
 `intent inbox --new` shows the private messages that arrived since the previous `--new` run. `--since <seq>` reads from a point instead, and `--relay` reads straight from the relay when the service is down. Output: `{messages, next, more, source}`. Each message: `seq`, `id`, `type` (`proof`, `accept` or `decline`), `from`, `intent`, `reply_to`, `created_at` and `content`.
 
 - `proof` content: `{v, nonce, format, result}`, where `result` is AIR's answer; check it with `intent verify <id>`
-- `accept` content: `{v, checkout_id}`
+- `accept` content: `{v, pay_surface}`, where `pay_surface` is `{rail, handle, currency, amount}`. `handle` is the checkout session id or the checkout URL. `amount` is the locked price in minor units
 - `decline` content: `{v, reason}`, with `reason` one of `price`, `timing`, `fit`, `chose_another`, `expired`, `other`
 
 ## subscribe / subscriptions / unsubscribe
